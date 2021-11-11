@@ -17,11 +17,11 @@
  * along with BoBot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Command from '../Command.js';
+import DMCommand from '../DMCommand.js';
 import fs from 'fs';
 import path from 'path';
 
-class help extends Command {
+class help extends DMCommand {
     constructor() {
         super();
     }
@@ -31,41 +31,42 @@ class help extends Command {
     }
 
     getDescription() {
-        return "Commande Help !";
+        return "Commande help";
     }
 
     isReservedToGod() {
         return false;
     }
-
-    async execute(interraction) {
+ 
+    async execute(message, content, args) {
         let commands = "";
         try{
-            const commandFiles = fs.readdirSync(path.resolve('commands')).filter(file => file.endsWith('.js'));
+            const commandFiles = fs.readdirSync(path.resolve('dmcommands')).filter(file => file.endsWith('.js'));
 
             for (let file of commandFiles){
-                const module = await import("file:///" + path.resolve(`commands/${file}`));
+                const module = await import("file:///" + path.resolve(`dmcommands/${file}`));
                 const command = new module.default;
                 if (!command.isReservedToGod()){
                     commands = commands + command.getName() + " -> " + command.getDescription() + "\n";
                 }
             }
 
-            interraction.reply({ embeds: [{
+            message.reply({ embeds: [{
                 color: 0x0099ff,
                 title: 'Help',
                 description: commands,
                 author: {
                     name: 'Wakestufou'
                 }
-            }], ephemeral: false })
+            }]});
 
         } catch(e){
+            message.reply("Un problème est survenue !" + e);
             return;
         }
 
-
     }
 }
-
+ 
 export default help;
+ 
