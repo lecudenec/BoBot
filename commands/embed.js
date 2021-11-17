@@ -103,24 +103,41 @@ class embed extends Command {
 
 
     async execute(interraction) {
-        let name = interraction.options.getString('titre');
-        let message = interraction.options.getString('message');
-        let color = interraction.options.getString('couleur') == null ? "#99AAB5" : interraction.options.getString('couleur');
-        let mess = "";
-        for (let i = 0; i<message.length; i++){
-            if(message[i]=="\\" && message[i+1]=="n"){
-                mess += '\n';
-                i++;
+        try{
+            let name = interraction.options.getString('titre');
+            let message = interraction.options.getString('message');
+            let color = interraction.options.getString('couleur') == null ? "#99AAB5" : interraction.options.getString('couleur');
+            let mess = "";
+            if (name.length >= 255){
+                interraction.reply({ content: "Titre trop long !", ephemeral:true });
+                return;
+            }
+            else if (message.length >= 255) {
+                interraction.reply({ content: "Message trop long !", ephemeral:true });
+                return;
             }
             else {
-                mess += message[i];
+                for (let i = 0; i<message.length; i++){
+                    if(message[i]=="\\" && message[i+1]=="n"){
+                        mess += '\n';
+                        i++;
+                    }
+                    else {
+                        mess += message[i];
+                    }
+                }
+                interraction.reply({ embeds: [{
+                    color: color,
+                    title: name,
+                    description: mess
+                }], ephemeral: false });
             }
         }
-        interraction.reply({ embeds: [{
-            color: color,
-            title: name,
-            description: mess
-        }], ephemeral: false });
+        catch(e){
+            interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
+        }
+        
     }
 }
 
