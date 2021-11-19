@@ -59,16 +59,17 @@ class delrole extends Command {
 
             for (let i = 0; i<roles.length; i++){
                 if (roles[i][0] === interraction.options.getString('name')){
-                    interraction.member.roles.remove(roles[i][1]);
-                    interraction.reply({ content: `Le role a été enlevé !`, ephemeral: false });
+                    await interraction.member.roles.remove(roles[i][1]);
+                    await interraction.reply({ content: `Le role a été enlevé !`, ephemeral: false });
                     return;
                 }
             }
 
-            interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: false });
+            await interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: false });
         }
         catch (e){
-            interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: true });
+            await interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: true });
+            console.log(e);
         }
     }
 }

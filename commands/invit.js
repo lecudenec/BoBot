@@ -37,7 +37,7 @@ class invit extends Command {
     }
 
     async execute(interraction) {
-        interraction.reply({ content: "Lien : https://discord.com/api/oauth2/authorize?client_id=788808098625224764&permissions=8&scope=bot%20applications.commands", ephemeral: false });
+        await interraction.reply({ content: "Lien : https://discord.com/api/oauth2/authorize?client_id=788808098625224764&permissions=8&scope=bot%20applications.commands", ephemeral: false });
     }
 }
 

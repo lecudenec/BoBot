@@ -37,7 +37,7 @@ class ping extends Command {
     }
 
     async execute(interraction) {
-        interraction.reply({ content: "Pong !", ephemeral: true });
+        await interraction.reply({ content: "Pong !", ephemeral: true });
     }
 }
 

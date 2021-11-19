@@ -53,16 +53,17 @@ class sparklesnickname extends Command {
             if (pseudo.length > 32) interraction.reply({ content: "Ton pseudo est trop long !", ephemeral: true});
             else {
                 if (interraction.member.manageable){
-                    interraction.member.setNickname(pseudo);
-                    interraction.reply({ content: "Votre pseudo a été modifié !", ephemeral: true });
+                    await interraction.member.setNickname(pseudo);
+                    await interraction.reply({ content: "Votre pseudo a été modifié !", ephemeral: true });
                 }
                 else {
-                    interraction.reply({ content: "Votre ne pouvez pas modifier votre pseudo !", ephemeral: true });
+                    await interraction.reply({ content: "Votre ne pouvez pas modifier votre pseudo !", ephemeral: true });
                 }
             }
         }
         catch(e){
-            interraction.reply("Une érreur est survenue lors du changement de pseudo !");
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
         }
     }
 }

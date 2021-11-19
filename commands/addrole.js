@@ -59,15 +59,16 @@ class addrole extends Command {
 
             for (let i = 0; i<roles.length; i++){
                 if (roles[i][0] === interraction.options.getString('name')){
-                    interraction.member.roles.add(roles[i][1]);
-                    interraction.reply({ content: `Le role a été ajouté !`, ephemeral: false });
+                    await interraction.member.roles.add(roles[i][1]);
+                    await interraction.reply({ content: `Le role a été ajouté !`, ephemeral: true });
                     return;
                 }
             }
-            interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: true });
+            await interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: true });
         }
         catch (e){
-            interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: true });
+            await interraction.reply({ content: `Le role n'est pas présent !`, ephemeral: true });
+            console.log(e);
         }
     }
 }

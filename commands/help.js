@@ -51,7 +51,7 @@ class help extends Command {
                 }
             }
 
-            interraction.reply({ embeds: [{
+            await interraction.reply({ embeds: [{
                 color: 0x0099ff,
                 title: 'Help',
                 description: commands,
@@ -61,6 +61,8 @@ class help extends Command {
             }], ephemeral: false })
 
         } catch(e){
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
             return;
         }
 

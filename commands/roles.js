@@ -38,23 +38,29 @@ class roles extends Command {
     }
 
     async execute(interraction) {
-        const guildid = interraction.guild.id;
+        try{
+            const guildid = interraction.guild.id;
 
-        let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
-        for (let i = 0; i<roles.length; i++){
-            roles[i] = roles[i].split(':');
+            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
+            for (let i = 0; i<roles.length; i++){
+                roles[i] = roles[i].split(':');
+            }
+
+            let message = "";
+            for (let i = 0; i<roles.length; i++){
+                message = message + roles[i][0] + '\n';
+            }
+
+            await interraction.reply({ embeds: [{
+                color: 0x0099ff,
+                title: 'Rôles Disponibles !',
+                description: message
+            }], ephemeral: false });
+        } catch(e){
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
         }
-
-        let message = "";
-        for (let i = 0; i<roles.length; i++){
-            message = message + roles[i][0] + '\n';
-        }
-
-        interraction.reply({ embeds: [{
-            color: 0x0099ff,
-            title: 'Rôles Disponibles !',
-            description: message
-        }], ephemeral: false })
+        
     }
 }
 

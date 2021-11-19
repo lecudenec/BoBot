@@ -109,11 +109,11 @@ class embed extends Command {
             let color = interraction.options.getString('couleur') == null ? "#99AAB5" : interraction.options.getString('couleur');
             let mess = "";
             if (name.length >= 255){
-                interraction.reply({ content: "Titre trop long !", ephemeral:true });
+                await interraction.reply({ content: "Titre trop long !", ephemeral:true });
                 return;
             }
             else if (message.length >= 255) {
-                interraction.reply({ content: "Message trop long !", ephemeral:true });
+                await interraction.reply({ content: "Message trop long !", ephemeral:true });
                 return;
             }
             else {
@@ -126,7 +126,7 @@ class embed extends Command {
                         mess += message[i];
                     }
                 }
-                interraction.reply({ embeds: [{
+                await interraction.reply({ embeds: [{
                     color: color,
                     title: name,
                     description: mess
@@ -134,7 +134,7 @@ class embed extends Command {
             }
         }
         catch(e){
-            interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
             console.log(e);
         }
         

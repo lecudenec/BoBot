@@ -61,15 +61,16 @@ class sparklesrename extends Command {
             else {
                 if (user.manageable){
                     await user.setNickname(pseudo);
-                    interraction.reply({ content: "Le pseudo a été modifié !", ephemeral: true });
+                    await interraction.reply({ content: "Le pseudo a été modifié !", ephemeral: true });
                 }
                 else {
-                    interraction.reply({ content: "Vous ne pouvez pas modifier ce pseudo !", ephemeral: true });
+                    await interraction.reply({ content: "Vous ne pouvez pas modifier ce pseudo !", ephemeral: true });
                 }
             }
         }
         catch(e){
-            interraction.reply("Une érreur est survenue lors du changement de pseudo !");
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
         }
     }
 }

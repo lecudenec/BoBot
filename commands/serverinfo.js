@@ -37,41 +37,47 @@ class serverinfo extends Command {
     }
 
     async execute(interraction) {
+        try{
+            const filterLevels = {
+                DISABLED: 'Off',
+                MEMBERS_WITHOUT_ROLES: 'No Role',
+                ALL_MEMBERS: 'Everyone'
+            };
+    
+            const verificationLevels = {
+                NONE: 'None',
+                LOW: 'Low',
+                MEDIUM: 'Medium',
+                HIGH: '(╯°□°）╯︵ ┻━┻',
+                VERY_HIGH: '┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻'
+            };
+    
+            await interraction.reply({ embeds: [{
+                color: 0x0099ff,
+                title: 'Server Info',
+                description: "Information du serveur !",
+                thumbnail: {
+                    url: interraction.guild.iconURL({ dynamic: true })
+                },
+                fields: [
+                    {
+                        name: '***Général***',
+                        value: `**Name:** ${interraction.guild.name}\n` +
+                        `**ID:** ${interraction.guild.id}\n` +
+                        `**Owner:** <@${interraction.guild.ownerId}>\n` +
+                        `**Member Count:** ${interraction.guild.memberCount}\n` +
+                        `**Boost Tier:** ${interraction.guild.preniumTier ? `Tier ${interraction.guild.preniumTier}` : 'None'}\n` +
+                        `**Explicit Filter:** ${filterLevels[interraction.guild.explicitContentFilter]}\n` +
+                        `**Verification Level:** ${verificationLevels[interraction.guild.verificationLevel]}\n`
+                    }
+                ]
+            }], ephemeral: false });
+        } catch(e){
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
+        }
                 
-        const filterLevels = {
-            DISABLED: 'Off',
-            MEMBERS_WITHOUT_ROLES: 'No Role',
-            ALL_MEMBERS: 'Everyone'
-        };
-
-        const verificationLevels = {
-            NONE: 'None',
-            LOW: 'Low',
-            MEDIUM: 'Medium',
-            HIGH: '(╯°□°）╯︵ ┻━┻',
-            VERY_HIGH: '┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻'
-        };
-
-        interraction.reply({ embeds: [{
-            color: 0x0099ff,
-            title: 'Server Info',
-            description: "Information du serveur !",
-            thumbnail: {
-                url: interraction.guild.iconURL({ dynamic: true })
-            },
-            fields: [
-                {
-                    name: '***Général***',
-                    value: `**Name:** ${interraction.guild.name}\n` +
-                    `**ID:** ${interraction.guild.id}\n` +
-                    `**Owner:** <@${interraction.guild.ownerId}>\n` +
-                    `**Member Count:** ${interraction.guild.memberCount}\n` +
-                    `**Boost Tier:** ${interraction.guild.preniumTier ? `Tier ${interraction.guild.preniumTier}` : 'None'}\n` +
-                    `**Explicit Filter:** ${filterLevels[interraction.guild.explicitContentFilter]}\n` +
-                    `**Verification Level:** ${verificationLevels[interraction.guild.verificationLevel]}\n`
-                }
-            ]
-        }], ephemeral: false })
+        
     }
 }
 

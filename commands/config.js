@@ -78,62 +78,68 @@ class config extends Command {
 
 
     async execute(interraction) {
-        const guildid = interraction.guild.id;
+        try{
+            const guildid = interraction.guild.id;
 
-        if (interraction.options.getString('option') === "addrole"){
-            let dataMessage = interraction.options.getString('name') + ":" + interraction.options.getString('idrole') + "\n";
-            fs.appendFileSync(`data/${guildid}.txt`, dataMessage);
-            interraction.reply({ content: "Le role a bien été ajouté !", ephemeral: true });
-        }
-        else if (interraction.options.getString('option') === "delrole"){
-            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
-            for (let i = 0; i<roles.length; i++){
-                roles[i] = roles[i].split(':');
+            if (interraction.options.getString('option') === "addrole"){
+                let dataMessage = interraction.options.getString('name') + ":" + interraction.options.getString('idrole') + "\n";
+                fs.appendFileSync(`data/${guildid}.txt`, dataMessage);
+                await interraction.reply({ content: "Le role a bien été ajouté !", ephemeral: true });
             }
-
-            let test = false;
-
-            for (let i = 0; i<roles.length; i++){
-                if (roles[i][0].includes(interraction.options.getString('name'))){
-                    if (roles[i][1].includes(interraction.options.getString('idrole'))){
-                        test = true;
-                    }
-                }
-            }
-
-            if (test){
-                let dataRole = "";
+            else if (interraction.options.getString('option') === "delrole"){
+                let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
                 for (let i = 0; i<roles.length; i++){
-                    console.log(roles[i][0]);
-                    if(roles[i][0] !== interraction.options.getString('name') && roles [i][0] !== ""){
-                        dataRole = dataRole + roles[i][0] + ":" + roles[i][1] + ";\n";
+                    roles[i] = roles[i].split(':');
+                }
+
+                let test = false;
+
+                for (let i = 0; i<roles.length; i++){
+                    if (roles[i][0].includes(interraction.options.getString('name'))){
+                        if (roles[i][1].includes(interraction.options.getString('idrole'))){
+                            test = true;
+                        }
                     }
                 }
-                //console.log(dataRole);
-                fs.writeFileSync(`data/${guildid}.txt`, dataRole);
-                interraction.reply({ content: `Le role a été supprimé !`, ephemeral: true });
+
+                if (test){
+                    let dataRole = "";
+                    for (let i = 0; i<roles.length; i++){
+                        console.log(roles[i][0]);
+                        if(roles[i][0] !== interraction.options.getString('name') && roles [i][0] !== ""){
+                            dataRole = dataRole + roles[i][0] + ":" + roles[i][1] + ";\n";
+                        }
+                    }
+                    //console.log(dataRole);
+                    fs.writeFileSync(`data/${guildid}.txt`, dataRole);
+                    await interraction.reply({ content: `Le role a été supprimé !`, ephemeral: true });
+                }
+                else {
+                    await interraction.reply({ content: `Role inexistant !`, ephemeral: true });
+                }
+            }
+            else if (interraction.options.getString('option') === "clear"){
+                fs.writeFileSync(`data/${guildid}.txt`, "");
+                await interraction.reply({ content: `La config a été vidée !`, ephemeral: true });
             }
             else {
-                interraction.reply({ content: `Role inexistant !`, ephemeral: true });
-            }
-        }
-        else if (interraction.options.getString('option') === "clear"){
-            fs.writeFileSync(`data/${guildid}.txt`, "");
-            interraction.reply({ content: `La config a été vidée !`, ephemeral: true });
-        }
-        else {
-            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
-            for (let i = 0; i<roles.length; i++){
-                roles[i] = roles[i].split(':');
-            }
+                let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
+                for (let i = 0; i<roles.length; i++){
+                    roles[i] = roles[i].split(':');
+                }
 
-            let message = "";
-            for (let i = 0; i<roles.length; i++){
-                message = message + roles[i][0] + '\n';
-            }
+                let message = "";
+                for (let i = 0; i<roles.length; i++){
+                    message = message + roles[i][0] + '\n';
+                }
 
-            interraction.reply({ content: `${message}`, ephemeral: true });
+                await interraction.reply({ content: `${message}`, ephemeral: true });
+            }
+        } catch(e){
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
         }
+        
        
     }
 }
