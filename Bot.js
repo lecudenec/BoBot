@@ -36,6 +36,7 @@ class Bot{
         this.__guild_dev = JSON.parse(fs.readFileSync('./config/config.json', {encoding: "utf-8"})).guild_dev.split(',');
         this.__commands = {};
         this.__dmcommands = {};
+        this.__buttons = {};
         this.__logger = Logger;
         this.__rest = new REST({ version: '9' }).setToken(this.__token);
     }
@@ -137,27 +138,38 @@ class Bot{
     }
 
     async onInteraction(interaction){
-        if (!interaction.isCommand()) return;
-
-        if (this.__commands[interaction.commandName] !== undefined){
-            if (this.__commands[interaction.commandName].isReservedToGod()){
-                if (!this.__god.includes(interaction.user.id) && interaction.member.id !== interaction.guild.ownerId){
-                    interaction.reply({ content: "Vous n'êtes pas Dieux !", ephemeral: true});
-                    return;
+        if (interaction.isCommand()){
+            if (this.__commands[interaction.commandName] !== undefined){
+                if (this.__commands[interaction.commandName].isReservedToGod()){
+                    if (!this.__god.includes(interaction.user.id) && interaction.member.id !== interaction.guild.ownerId){
+                        interaction.reply({ content: "Vous n'êtes pas Dieux !", ephemeral: true});
+                        return;
+                    }
                 }
-            }
-
-            try{
-                await this.__commands[interaction.commandName].execute(interaction);
-            } catch(e) {
-                this.__logger.error("Erreur dans l'execution de la commande : " + interaction.commandName, e);
-                try {
-                    interaction.reply({ content: "Une erreur est survenue !", ephemeral: true});
-                } catch (e) {
-                    this.__logger.error("Erreur dans la réponse de l'érreur !",e);
+    
+                try{
+                    await this.__commands[interaction.commandName].execute(interaction);
+                } catch(e) {
+                    this.__logger.error("Erreur dans l'execution de la commande : " + interaction.commandName, e);
+                    try {
+                        interaction.reply({ content: "Une erreur est survenue !", ephemeral: true});
+                    } catch (e) {
+                        this.__logger.error("Erreur dans la réponse de l'érreur !",e);
+                    }
                 }
             }
         }
+        else if (interaction.isButton()){
+            if (this.__buttons[interaction.customId] !== undefined){
+                try{
+                    await this.__buttons[interaction.customId].bind(this.__buttons[interaction.customId])(interaction);
+                } catch(e){
+                    this.__logger.error("Erreur dans l'execution de la commande : " + interaction.commandName, e);
+                }
+            }
+        }
+
+        
     }
 
     async onMessage(message) {
@@ -195,6 +207,10 @@ class Bot{
                 break;
             }
         }
+    }
+
+    registerButton(id, handler){
+        this.__buttons[id] = handler;
     }
 
 }

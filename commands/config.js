@@ -72,6 +72,11 @@ class config extends Command {
             name: "idrole",
             description: "L'id du role",
             required: true
+        },{
+            type: ApplicationCommandOptionType.String,
+            name: "commentaire",
+            description: "Le commentaire du role",
+            required: false
         }
         ];
     }
@@ -82,7 +87,9 @@ class config extends Command {
             const guildid = interraction.guild.id;
 
             if (interraction.options.getString('option') === "addrole"){
-                let dataMessage = interraction.options.getString('name') + ":" + interraction.options.getString('idrole') + "\n";
+                let dataMessage = interraction.options.getString('name') + ":" + interraction.options.getString('idrole');
+                if (interraction.options.getString('commentaire') !== null) dataMessage += ":" + interraction.options.getString('commentaire') + "\n";
+                else dataMessage += ":Pas de commentaire pour ce rôle\n";
                 fs.appendFileSync(`data/${guildid}.txt`, dataMessage);
                 await interraction.reply({ content: "Le role a bien été ajouté !", ephemeral: true });
             }

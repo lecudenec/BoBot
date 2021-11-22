@@ -19,10 +19,18 @@
 
 import Command from '../Command.js';
 import fs from 'fs';
+import Bot from '../Bot.js';
+import { MessageActionRow, MessageButton } from 'discord.js';
 
 class roles extends Command {
     constructor() {
         super();
+        Bot.registerButton("role_next", this.buttonNext.bind(this));
+        Bot.registerButton("role_previous", this.buttonPrevious.bind(this));
+        Bot.registerButton("role_add", this.buttonAddRole.bind(this));
+        Bot.registerButton("role_del", this.buttonDelRole.bind(this));
+        this.__roles;
+        this.__id = 0;
     }
 
     getName() {
@@ -30,11 +38,66 @@ class roles extends Command {
     }
 
     getDescription() {
-        return "Montre les rôles disponibles !";
+        return "Ajoute/supprime toi un rôle !";
     }
 
     isReservedToGod() {
         return false;
+    }
+
+
+    async buttonNext(interraction){
+        try {
+            if (this.__id >= this.__roles.length-2) this.__id = 0;
+            else this.__id = this.__id + 1;
+
+            let message = "Description du rôle : \n" + this.__roles[this.__id][2];
+
+            await interraction.deferUpdate();
+            await interraction.editReply({ embeds: [{
+                color: 0x0099ff,
+                title: 'Rôle : ' + this.__roles[this.__id][0],
+                description: message
+            }]});
+        } catch(e){
+            console.log("une erreur est survenue Command : roles | ", e);
+        }
+    }
+
+    async buttonPrevious(interraction){
+        try {
+            if (this.__id == 0) this.__id = this.__roles.length - 2;
+            else this.__id = this.__id - 1;
+
+            let message = "Description du rôle : \n" + this.__roles[this.__id][2];
+
+            await interraction.deferUpdate();
+            await interraction.editReply({ embeds: [{
+                color: 0x0099ff,
+                title: 'Rôle : ' + this.__roles[this.__id][0],
+                description: message
+            }]});
+        } catch(e){
+            console.log("une erreur est survenue Command : roles | ", e);
+        }
+    }
+
+    async buttonAddRole(interraction){
+        try{
+            await interraction.member.roles.add(this.__roles[this.__id][1]);
+        } catch(e){
+            console.log("une erreur est survenue Command : roles lors de l'ajout d'un role | ", e);
+        }
+        
+    }
+
+    async buttonDelRole(interraction){
+        try{
+            await interraction.member.roles.remove(this.__roles[this.__id][1]);
+        } catch(e){
+            console.log("une erreur est survenue Command : roles lors de l'ajout d'un role | ", e);
+        }
+        
     }
 
     async execute(interraction) {
@@ -46,16 +109,41 @@ class roles extends Command {
                 roles[i] = roles[i].split(':');
             }
 
-            let message = "";
-            for (let i = 0; i<roles.length; i++){
-                message = message + roles[i][0] + '\n';
+            this.__roles = roles;
+
+            if(this.__roles.length === 1){
+                await interraction.reply({ content: "Aucun rôle disponible sur se serveur ", ephemeral: true});
+                return;
             }
 
-            await interraction.reply({ embeds: [{
+            let message = "Description du rôle : \n" + this.__roles[this.__id][2];
+
+            const row = new MessageActionRow().addComponents(
+                new MessageButton()
+                    .setCustomId("role_previous")
+                    .setLabel("Role Précedent")
+                    .setStyle("PRIMARY"),
+                new MessageButton()
+                    .setCustomId("role_next")
+                    .setLabel("Role suivant")
+                    .setStyle("PRIMARY"),
+                new MessageButton()
+                    .setCustomId("role_add")
+                    .setLabel("Ajout du role")
+                    .setStyle("SUCCESS"),
+                new MessageButton()
+                    .setCustomId("role_del")
+                    .setLabel("Suppression du role")
+                    .setStyle("SUCCESS")
+            );
+
+            await interraction.deferReply();
+
+            await interraction.editReply({ embeds: [{
                 color: 0x0099ff,
-                title: 'Rôles Disponibles !',
+                title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }], ephemeral: false });
+            }], ephemeral: false, components: [row] });
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
             console.log(e);
