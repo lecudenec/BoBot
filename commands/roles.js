@@ -48,6 +48,15 @@ class roles extends Command {
 
     async buttonNext(interraction){
         try {
+            const guildid = interraction.guild.id;
+
+            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
+            for (let i = 0; i<roles.length; i++){
+                roles[i] = roles[i].split(':');
+            }
+
+            this.__roles = roles;
+
             if (this.__id >= this.__roles.length-2) this.__id = 0;
             else this.__id = this.__id + 1;
 
@@ -66,6 +75,15 @@ class roles extends Command {
 
     async buttonPrevious(interraction){
         try {
+            const guildid = interraction.guild.id;
+
+            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
+            for (let i = 0; i<roles.length; i++){
+                roles[i] = roles[i].split(':');
+            }
+
+            this.__roles = roles;
+
             if (this.__id == 0) this.__id = this.__roles.length - 2;
             else this.__id = this.__id - 1;
 
