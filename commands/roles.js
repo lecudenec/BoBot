@@ -48,6 +48,7 @@ class roles extends Command {
 
     async buttonNext(interraction){
         try {
+            await interraction.deferUpdate();
             const guildid = interraction.guild.id;
 
             let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
@@ -62,12 +63,11 @@ class roles extends Command {
 
             let message = "Description du rôle : \n" + this.__roles[this.__id][2];
 
-            await interraction.deferUpdate();
             await interraction.editReply({ embeds: [{
                 color: 0x0099ff,
                 title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }]});
+            }], ephemeral: true});
         } catch(e){
             console.log("une erreur est survenue Command : roles | ", e);
         }
@@ -75,6 +75,7 @@ class roles extends Command {
 
     async buttonPrevious(interraction){
         try {
+            await interraction.deferUpdate();
             const guildid = interraction.guild.id;
 
             let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
@@ -89,19 +90,19 @@ class roles extends Command {
 
             let message = "Description du rôle : \n" + this.__roles[this.__id][2];
 
-            await interraction.deferUpdate();
             await interraction.editReply({ embeds: [{
                 color: 0x0099ff,
                 title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }]});
+            }], ephemeral: true});
         } catch(e){
             console.log("une erreur est survenue Command : roles | ", e);
         }
     }
 
     async buttonAddRole(interraction){
-        try{
+        try{            
+            await interraction.deferUpdate();
             await interraction.member.roles.add(this.__roles[this.__id][1]);
         } catch(e){
             console.log("une erreur est survenue Command : roles lors de l'ajout d'un role | ", e);
@@ -111,6 +112,7 @@ class roles extends Command {
 
     async buttonDelRole(interraction){
         try{
+            await interraction.deferUpdate();
             await interraction.member.roles.remove(this.__roles[this.__id][1]);
         } catch(e){
             console.log("une erreur est survenue Command : roles lors de l'ajout d'un role | ", e);
@@ -161,7 +163,7 @@ class roles extends Command {
                 color: 0x0099ff,
                 title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }], ephemeral: false, components: [row] });
+            }], ephemeral: true, components: [row] });
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
             console.log(e);

@@ -19,6 +19,9 @@
 
 
 import Bot from './Bot.js';
+import process from 'process';
+
+global.dev = process.argv.includes("--DEV");
 
 await Bot.initClient();
 Bot.start();

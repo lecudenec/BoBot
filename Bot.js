@@ -57,7 +57,7 @@ class Bot{
 
 
         // We are in DEV mode, register commands per guilds
-        if (false) {
+        if (global.dev) {
             for (let guild_id of this.__guild_dev) {
                 try {
                     this.__logger.info("Chargements des commandes sur le serveur : " + guild_id + "!");
@@ -173,7 +173,7 @@ class Bot{
     }
 
     async onMessage(message) {
-        if (!message.channel instanceof DMChannel)
+        if (!(message.channel instanceof DMChannel))
             return;
 
         try {

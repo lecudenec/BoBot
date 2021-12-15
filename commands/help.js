@@ -65,6 +65,7 @@ class help extends Command {
             console.log(e);
             return;
         }
+        //console.log("nfdjknfdsq");
 
 
     }
