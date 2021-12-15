@@ -24,6 +24,12 @@ import fs from 'fs';
 class config extends Command {
     constructor() {
         super();
+        this.sub = {
+            "clear": this.exec_clear,
+            "ajout": this.exec_add,
+            "supprimer": this.exec_del,
+            "voir": this.exec_view
+        }
     }
 
     getName() {
@@ -31,7 +37,7 @@ class config extends Command {
     }
 
     getDescription() {
-        return "Configure le bot";
+        return "Configure le bot pour le serveur !";
     }
 
     isReservedToGod() {
@@ -40,114 +46,133 @@ class config extends Command {
 
     getOptions() {
         return [{
-            type: ApplicationCommandOptionType.String,
-            name: "option",
-            description: "addrole/delrole/getrole",
-            choices: [
-                {
-                    "name":"Ajout d'un role",
-                    "value":"addrole"
-                },
-                {
-                    "name":"Suppresion d'un role",
-                    "value":"delrole"
-                },
-                {
-                    "name":"Voir les roles",
-                    "value":"getrole"
-                },
-                {
-                    "name":"Clear la config",
-                    "value":"clear"
-                }
-            ],
-            required: true
+            type: ApplicationCommandOptionType.Subcommand,
+            name: "ajout",
+            description: "Ajout un rôle dans la configuration",
+            options: [{
+                type: ApplicationCommandOptionType.Role,
+                name: "role",
+                description: "Le role a rajouter à la configuration",
+                required: true
+            }, {
+                type: ApplicationCommandOptionType.String,
+                name: "commentaire",
+                description: "Une description du role"
+            }]
+        },{
+            type: ApplicationCommandOptionType.Subcommand,
+            name: "supprimer",
+            description: "Supprime un rôle dans la configuration",
+            options: [{
+                type: ApplicationCommandOptionType.Role,
+                name: "role",
+                description: "Le role a supprimer de la configuration",
+                required: true
+            }]
         }, {
-            type: ApplicationCommandOptionType.String,
-            name: "name",
-            description: "Nom du role",
-            required: true
-        },{
-            type: ApplicationCommandOptionType.String,
-            name: "idrole",
-            description: "L'id du role",
-            required: true
-        },{
-            type: ApplicationCommandOptionType.String,
-            name: "commentaire",
-            description: "Le commentaire du role",
-            required: false
+            type: ApplicationCommandOptionType.Subcommand,
+            name: "voir",
+            description: "Voir les rôles dans la configuration"
+        }, {
+            type: ApplicationCommandOptionType.Subcommand,
+            name: "clear",
+            description: "Vide la configuration"
         }
         ];
     }
 
+    async exec_view(interraction){
+        const guildid = interraction.guild.id;
 
-    async execute(interraction) {
+        try{
+            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
+            for (let i = 0; i<roles.length; i++){
+                roles[i] = roles[i].split(':');
+            }
+
+            let message = "";
+            for (let i = 0; i<roles.length; i++){
+                message = message + roles[i][0] + '\n';
+            }
+
+            await interraction.reply({ content: `Role Disponible :\n${message}`, ephemeral: true });
+        } catch(e) {
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
+        }
+    }
+
+    async exec_del(interraction){
         try{
             const guildid = interraction.guild.id;
 
-            if (interraction.options.getString('option') === "addrole"){
-                let dataMessage = interraction.options.getString('name') + ":" + interraction.options.getString('idrole');
-                if (interraction.options.getString('commentaire') !== null) dataMessage += ":" + interraction.options.getString('commentaire') + "\n";
-                else dataMessage += ":Pas de commentaire pour ce rôle\n";
-                fs.appendFileSync(`data/${guildid}.txt`, dataMessage);
-                await interraction.reply({ content: "Le role a bien été ajouté !", ephemeral: true });
+            let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
+            for (let i = 0; i<roles.length; i++){
+                roles[i] = roles[i].split(':');
             }
-            else if (interraction.options.getString('option') === "delrole"){
-                let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
-                for (let i = 0; i<roles.length; i++){
-                    roles[i] = roles[i].split(':');
-                }
-
-                let test = false;
-
-                for (let i = 0; i<roles.length; i++){
-                    if (roles[i][0].includes(interraction.options.getString('name'))){
-                        if (roles[i][1].includes(interraction.options.getString('idrole'))){
-                            test = true;
-                        }
+    
+            let test = false;
+    
+            for (let i = 0; i<roles.length; i++){
+                if (roles[i][0].includes(interraction.options.getRole('role').name)){
+                    if (roles[i][1].includes(interraction.options.getRole('role').id)){
+                        test = true;
                     }
                 }
-
-                if (test){
-                    let dataRole = "";
-                    for (let i = 0; i<roles.length; i++){
-                        console.log(roles[i][0]);
-                        if(roles[i][0] !== interraction.options.getString('name') && roles [i][0] !== ""){
-                            dataRole = dataRole + roles[i][0] + ":" + roles[i][1] + ";\n";
-                        }
-                    }
-                    //console.log(dataRole);
-                    fs.writeFileSync(`data/${guildid}.txt`, dataRole);
-                    await interraction.reply({ content: `Le role a été supprimé !`, ephemeral: true });
-                }
-                else {
-                    await interraction.reply({ content: `Role inexistant !`, ephemeral: true });
-                }
             }
-            else if (interraction.options.getString('option') === "clear"){
-                fs.writeFileSync(`data/${guildid}.txt`, "");
-                await interraction.reply({ content: `La config a été vidée !`, ephemeral: true });
+    
+            if (test){
+                let dataRole = "";
+                for (let i = 0; i<roles.length; i++){
+                    //console.log(roles[i][0]);
+                    if(roles[i][0] !== interraction.options.getRole('role').name && roles [i][0] !== "" && roles[i][1] !== interraction.options.getRole('role').id){
+                        dataRole = dataRole + roles[i][0] + ":" + roles[i][1] + ";\n";
+                    }
+                }
+                //console.log(dataRole);
+                fs.writeFileSync(`data/${guildid}.txt`, dataRole);
+                await interraction.reply({ content: `Le role a été supprimé !`, ephemeral: true });
             }
             else {
-                let roles = (fs.readFileSync(`data/${guildid}.txt`, {encoding: "utf-8"})).toString().split('\n');
-                for (let i = 0; i<roles.length; i++){
-                    roles[i] = roles[i].split(':');
-                }
-
-                let message = "";
-                for (let i = 0; i<roles.length; i++){
-                    message = message + roles[i][0] + '\n';
-                }
-
-                await interraction.reply({ content: `${message}`, ephemeral: true });
+                await interraction.reply({ content: `Role inexistant !`, ephemeral: true });
             }
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
             console.log(e);
         }
         
-       
+
+    }
+    
+    async exec_add(interraction){
+        const guildid = interraction.guild.id;
+        try{
+            let dataMessage = interraction.options.getRole('role').name + ":" + interraction.options.getRole('role').id;
+            if (interraction.options.getString('commentaire') !== null) dataMessage += ":" + interraction.options.getString('commentaire') + "\n";
+            else dataMessage += ":Pas de commentaire pour ce rôle\n";
+            fs.appendFileSync(`data/${guildid}.txt`, dataMessage);
+            await interraction.reply({ content: "Le role a bien été ajouté !", ephemeral: true });
+        } catch(e){
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
+        }
+    }
+
+    async exec_clear(interraction){
+        const guildid = interraction.guild.id;
+
+        try{
+            fs.writeFileSync(`data/${guildid}.txt`, "");
+            await interraction.reply({ content: `La config a été vidée !`, ephemeral: true });
+        } catch(e){
+            await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
+            console.log(e);
+        }
+    }
+
+
+    async execute(interraction) {
+        await this.sub[interraction.options.getSubcommand()](interraction);
     }
 }
 
