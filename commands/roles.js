@@ -29,7 +29,7 @@ class roles extends Command {
         Bot.registerButton("role_previous", this.buttonPrevious.bind(this));
         Bot.registerButton("role_add", this.buttonAddRole.bind(this));
         Bot.registerButton("role_del", this.buttonDelRole.bind(this));
-        this.__roles;
+        //this.__roles;
         this.__id = 0;
     }
 
