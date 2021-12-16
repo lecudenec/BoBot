@@ -39,6 +39,8 @@ class Bot{
         this.__buttons = {};
         this.__logger = Logger;
         this.__rest = new REST({ version: '9' }).setToken(this.__token);
+        this.__invite = new Map();
+        this.__nbInvite = new Map();
     }
 
     async registerCommands(){
@@ -111,21 +113,78 @@ class Bot{
     }
 
     async initClient(){
-        this.__client = new Client({ intents: ["GUILDS", "GUILD_PRESENCES", "DIRECT_MESSAGES", "GUILD_MEMBERS"], partials: ["CHANNEL"]});
+        this.__client = new Client({ intents: ["GUILDS", "GUILD_PRESENCES", "DIRECT_MESSAGES", "GUILD_MEMBERS", "GUILD_INVITES"], partials: ["CHANNEL"]});
 
         this.__client.on('ready', this.onReady.bind(this));
         this.__client.on('interactionCreate', this.onInteraction.bind(this));
         this.__client.on('messageCreate', this.onMessage.bind(this));
+        this.__client.on('guildCreate', this.onGuildCreate.bind(this));
+        this.__client.on('guildDelete', this.onGuildLeft.bind(this));
+        this.__client.on('guildMemberAdd', this.onguildMemberAdd.bind(this));
+        this.__client.on('inviteCreate', this.onInvitCreate.bind(this));
+        this.__client.on('inviteDelete', this.onInviteDelete.bind(this));
     }
 
     start(){
         this.__client.login(this.__token);
     }
 
+    async onguildMemberAdd(member){
+        this.__logger.info("Qqn vient d'arriver sur le serveur : " + member.guild.name);
+        let guild = member.guild;
+        /*
+        for (var [key, value] of this.__nbInvite){
+            console.log(key.toString() + " " + value);
+        }*/
+
+        for (var [key, value] of this.__invite.get(guild.id)){
+            //console.log(value.code + " " + this.__invite.has(value.code) + " " + value.uses);
+            if (this.__nbInvite.get(value.code.toString()) !== value.uses.toString()){
+                this.__nbInvite.set(value.code.toString(), Number(this.__nbInvite.get(value.code.toString())) + Number(1));
+                this.__logger.info(member.user.tag + " a été invité par " + value.inviter.tag);
+                guild.systemChannel.send("Bonjour <@" + member.user.id + "> ! Tu a été invité par <@" + value.inviter.id + "> !");
+            }
+            
+        }
+    } 
+
+    async onInvitCreate(invite){
+        this.__logger.info("Une invitation a été crée sur le serveur : " + invite.guild.name);
+        this.__invite.get(invite.guild.id).set(invite.code, invite);
+        this.__nbInvite.set(invite.code.toString(), invite.uses);
+        //console.log(this.__invite.get(invite.guild.id));
+        //console.log(this.__nbInvite);
+    }
+
+    async onInviteDelete(invite){
+        this.__logger.info("Une invitation a été supprimé sur le serveur : " + invite.guild.name);
+        try{
+            this.__invite.get(invite.guild.id).delete(invite.code);
+            this.__nbInvite.delete(invite.code);
+            //console.log(this.__invite.get(invite.guild.id));
+            //console.log(this.__nbInvite);
+        } catch (e) {
+            this.__logger.warn("Une erreur est survenue !");
+        }
+    }
+
+
+    async onGuildLeft(guild){
+        this.__logger.info("J'ai du quitter le serveur :(");
+        this.__logger.info("Nom : " + guild.name);
+        this.__logger.info("Id : " + guild.id);
+    }
+
+    async onGuildCreate(guild){
+        this.__logger.info("Je suis ajouté sur un nouveau serveur !");
+        this.__logger.info("Nom : " + guild.name);
+        this.__logger.info("Id : " + guild.id);
+        guild.systemChannel.send("Bonjour, ravi de faire votre connaissance !\nJe m'appelle BoBot ! Et je suis ici pour améliorer votre serveur.\nUtilise la commande /help pour en savoir plus ! ");
+    }
+
 
     async onReady(){
-        this.__logger.info("Lancement du BoBot !");
-        //const guilds_id = this.__client.guilds.cache.map(g => g.id);
+        const guilds = this.__client.guilds.cache.map(g => g);
         await this.registerCommands();
 
         this.__logger.info(this.__client.user.tag + " Connecté !");
@@ -134,7 +193,41 @@ class Bot{
         });
         this.__client.user.setActivity('/help', {
             type: 'PLAYING'
-        })
+        });
+
+        for (let guild of guilds){
+            this.__logger.info("Enregistrement des liens d'invitations de la guild : " + guild.name +"\n");
+            this.__invite.set(guild.id, new Map());
+            //const invite = guild.invites.cache.map(i => i);
+            this.__logger.info(guild.id);
+            guild.invites.fetch().then((invitation) => {
+                //console.log(guild.name + " : " + invitation.has("Ey9kp3R6PY"));
+                //console.log(invitation);
+
+                for (var [key, value] of invitation){
+                    //console.log(key + " a pour valeur : " + value.inviter.tag);
+                    this.__invite.get(guild.id).set(value.code, value);
+                    this.__nbInvite.set(value.code.toString(), value.uses);
+                    //console.log(value.code.toString());
+                }
+                /*
+
+                for (var [key, value] of this.__invite){
+                    for (var [key2, value2] of value){
+                        console.log(key + " a pour valeur : key2 :" + key2 + " a pour valeur : " + value2.inviter.tag);
+                    }
+                    
+                }*/
+                //var invite = guild.invites.cache.map(i => i);
+                //console.log(invite[1]);
+            })
+            /*
+            for (let invitation of invite){
+                this.__invite.get(guild.id).push(invitation);
+                this.__logger.info("Invitation : " + invitation.toString());
+            }*/
+        }
+        this.__logger.info("Lancement du BoBot !");
     }
 
     async onInteraction(interaction){
