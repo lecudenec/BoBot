@@ -180,6 +180,14 @@ class Bot{
         this.__logger.info("Nom : " + guild.name);
         this.__logger.info("Id : " + guild.id);
         guild.systemChannel.send("Bonjour, ravi de faire votre connaissance !\nJe m'appelle BoBot ! Et je suis ici pour améliorer votre serveur.\nUtilise la commande /help pour en savoir plus ! ");
+        
+        this.__invite.set(guild.id, new Map());
+        guild.invites.fetch().then((invitation) => {
+            for (var [key, value] of invitation){
+                this.__invite.get(guild.id).set(value.code, value);
+                this.__nbInvite.set(value.code.toString(), value.uses);
+            }
+        });
     }
 
 
@@ -220,7 +228,7 @@ class Bot{
                 }*/
                 //var invite = guild.invites.cache.map(i => i);
                 //console.log(invite[1]);
-            })
+            });
             /*
             for (let invitation of invite){
                 this.__invite.get(guild.id).push(invitation);
