@@ -129,31 +129,42 @@ class Bot{
         this.__client.login(this.__token);
     }
 
-    async onguildMemberAdd(member){
-        this.__logger.info("Qqn vient d'arriver sur le serveur : " + member.guild.name);
-        let guild = member.guild;
-        /*
-        for (var [key, value] of this.__nbInvite){
-            console.log(key.toString() + " " + value);
-        }*/
 
-        for (var [key, value] of this.__invite.get(guild.id)){
-            //console.log(value.code + " " + this.__invite.has(value.code) + " " + value.uses);
-            if (this.__nbInvite.get(value.code.toString()) !== value.uses.toString()){
-                this.__nbInvite.set(value.code.toString(), Number(this.__nbInvite.get(value.code.toString())) + Number(1));
-                this.__logger.info(member.user.tag + " a été invité par " + value.inviter.tag);
-                guild.systemChannel.send("Bonjour <@" + member.user.id + "> ! Tu a été invité par <@" + value.inviter.id + "> !");
+    async onguildMemberAdd(member){
+        try {
+            this.__logger.info("Qqn vient d'arriver sur le serveur : " + member.guild.name);
+            let guild = member.guild;
+            let test = true;
+            
+            await guild.invites.fetch().then((invitation) => {
+                for (var [key, value] of invitation){
+                    this.__invite.get(guild.id).set(value.code, value);
+                }
+                test = false;
+            });
+
+            while(test) {
+                this.__logger.info("Récupération des invitations !");
             }
             
+            for (var [key, value] of this.__invite.get(guild.id)){
+                if (Number(this.__nbInvite.get(value.code.toString()).toString()) !== Number(value.uses.toString())){
+                    this.__nbInvite.set(value.code.toString(), Number(this.__nbInvite.get(value.code.toString())) + Number(1));
+                    this.__logger.info(member.user.tag + " a été invité par " + value.inviter.tag);
+                    guild.systemChannel.send("Bonjour <@" + member.user.id + "> ! Tu a été invité par <@" + value.inviter.id + "> !");
+                }
+                
+            }
+        } catch(e){
+            this.__logger.warn("Je n'arrive pas à envoyer dans le systemChannel des informations du serveur : " + member.guild.tag);
         }
+        
     } 
 
     async onInvitCreate(invite){
         this.__logger.info("Une invitation a été crée sur le serveur : " + invite.guild.name);
         this.__invite.get(invite.guild.id).set(invite.code, invite);
         this.__nbInvite.set(invite.code.toString(), invite.uses);
-        //console.log(this.__invite.get(invite.guild.id));
-        //console.log(this.__nbInvite);
     }
 
     async onInviteDelete(invite){
@@ -161,8 +172,6 @@ class Bot{
         try{
             this.__invite.get(invite.guild.id).delete(invite.code);
             this.__nbInvite.delete(invite.code);
-            //console.log(this.__invite.get(invite.guild.id));
-            //console.log(this.__nbInvite);
         } catch (e) {
             this.__logger.warn("Une erreur est survenue !");
         }
@@ -176,18 +185,28 @@ class Bot{
     }
 
     async onGuildCreate(guild){
-        this.__logger.info("Je suis ajouté sur un nouveau serveur !");
-        this.__logger.info("Nom : " + guild.name);
-        this.__logger.info("Id : " + guild.id);
-        guild.systemChannel.send("Bonjour, ravi de faire votre connaissance !\nJe m'appelle BoBot ! Et je suis ici pour améliorer votre serveur.\nUtilise la commande /help pour en savoir plus ! ");
-        
-        this.__invite.set(guild.id, new Map());
-        guild.invites.fetch().then((invitation) => {
-            for (var [key, value] of invitation){
-                this.__invite.get(guild.id).set(value.code, value);
-                this.__nbInvite.set(value.code.toString(), value.uses);
+        try {
+            
+            this.__logger.info("Je suis ajouté sur un nouveau serveur !");
+            this.__logger.info("Nom : " + guild.name);
+            this.__logger.info("Id : " + guild.id);
+            try {
+                guild.systemChannel.send("Bonjour, ravi de faire votre connaissance !\nJe m'appelle BoBot ! Et je suis ici pour améliorer votre serveur.\nUtilise la commande /help pour en savoir plus ! ");
+            } catch(e) {
+                this.__logger.warn("Je n'arrive pas à envoyer dans le systemChannel des informations du serveur : " + member.guild.tag);
             }
-        });
+            
+            this.__invite.set(guild.id, new Map());
+            await guild.invites.fetch().then((invitation) => {
+                for (var [key, value] of invitation){
+                    this.__invite.get(guild.id).set(value.code, value);
+                    this.__nbInvite.set(value.code.toString(), value.uses);
+                }
+            });
+        }
+        catch(e){
+            this.__logger.warn("Un porblème est survenue lors du onGuildCreate");
+        }
     }
 
 
@@ -204,36 +223,15 @@ class Bot{
         });
 
         for (let guild of guilds){
-            this.__logger.info("Enregistrement des liens d'invitations de la guild : " + guild.name +"\n");
+            this.__logger.info("Enregistrement des liens d'invitations de la guild : " + guild.name + " " + guild.id);
             this.__invite.set(guild.id, new Map());
-            //const invite = guild.invites.cache.map(i => i);
-            this.__logger.info(guild.id);
-            guild.invites.fetch().then((invitation) => {
-                //console.log(guild.name + " : " + invitation.has("Ey9kp3R6PY"));
-                //console.log(invitation);
-
+            
+            await guild.invites.fetch().then((invitation) => {
                 for (var [key, value] of invitation){
-                    //console.log(key + " a pour valeur : " + value.inviter.tag);
                     this.__invite.get(guild.id).set(value.code, value);
                     this.__nbInvite.set(value.code.toString(), value.uses);
-                    //console.log(value.code.toString());
                 }
-                /*
-
-                for (var [key, value] of this.__invite){
-                    for (var [key2, value2] of value){
-                        console.log(key + " a pour valeur : key2 :" + key2 + " a pour valeur : " + value2.inviter.tag);
-                    }
-                    
-                }*/
-                //var invite = guild.invites.cache.map(i => i);
-                //console.log(invite[1]);
             });
-            /*
-            for (let invitation of invite){
-                this.__invite.get(guild.id).push(invitation);
-                this.__logger.info("Invitation : " + invitation.toString());
-            }*/
         }
         this.__logger.info("Lancement du BoBot !");
     }
