@@ -25,8 +25,21 @@ class Logger{
     }
 
     __write(string, prefix, logfnc){
-        const date = new Date().toISOString();
-        const pref = "[" + date + "][" + prefix + "] ";
+        
+
+        Number.prototype.padLeft = function(base,chr){
+            var  len = (String(base || 10).length - String(this).length)+1;
+            return len > 0? new Array(len).join(chr || '0')+this : this;
+        }
+
+        const d = new Date();
+        const dformat = [(d.getMonth()+1).padLeft(),
+            d.getDate().padLeft(),
+            d.getFullYear()].join('/') +' ' +
+           [d.getHours().padLeft(),
+            d.getMinutes().padLeft(),
+            d.getSeconds().padLeft()].join(':');
+        const pref = "[" + dformat + "][" + prefix + "] ";
 
         for (let line of string.toString().split('\n')){
             logfnc(pref + line);
