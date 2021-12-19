@@ -78,12 +78,29 @@ class nonPing extends Command {
             
         } catch (e) {
             await interraction.reply({ content: "Un problème a été rencontré !", ephemeral:true});
-            Logger.error("Une erreur est survenue ! ", e, "ERR ! nonPing");
+            Logger.error("Une erreur est survenue ! ", e, "ERR ! nonPing add");
         }
     }
 
     async exec_delete(interraction){
-        await interraction.reply({ content : "Commande pas encore codé !", ephemeral: true});
+        try {
+            let userNonPingList = (fs.readFileSync(`data/nonPingList.txt`, {encoding: "utf-8"})).toString().split(';');
+            let message = "";
+
+            for(let w = 0; w<userNonPingList.length; w++){
+                if (interraction.user.id.toString() !== userNonPingList[w].toString() && userNonPingList[w] !== null && userNonPingList[w].toString() !== ""){
+                    message += userNonPingList[w].toString() + ";";
+                }
+            }
+
+            
+            fs.writeFileSync(`data/nonPingList.txt`, message);
+            await interraction.reply({ content: `Vous pouvez à nouveau vous faire ping !`, ephemeral: true });
+            
+        } catch (e) {
+            await interraction.reply({ content: "Un problème a été rencontré !", ephemeral:true});
+            Logger.error("Une erreur est survenue ! ", e, "ERR ! nonPing delete");
+        }
     }
 
     async execute(interraction) {

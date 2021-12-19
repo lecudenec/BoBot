@@ -50,7 +50,7 @@ class lejeu extends Command {
 
         const guildid = interraction.guild.id;
 
-        let userNonPingList = (fs.readFileSync(`data/nonPingList.txt`, {encoding: "utf-8"})).toString().split('\n');
+        let userNonPingList = (fs.readFileSync(`data/nonPingList.txt`, {encoding: "utf-8"})).toString().split(';');
         
         let test1 = true;
 
