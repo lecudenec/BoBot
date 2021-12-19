@@ -18,6 +18,7 @@
  */
 
 import Command from '../Command.js';
+import Bot from '../Bot.js';
 
 class invit extends Command {
     constructor() {
@@ -37,8 +38,8 @@ class invit extends Command {
     }
 
     async execute(interraction) {
-        await interraction.reply({ content: "Lien : https://discord.com/api/oauth2/authorize?client_id=788808098625224764&permissions=8&scope=bot%20applications.commands", ephemeral: false });
+        await interraction.reply({ content: "Lien : " + Bot.__link, ephemeral: false });
     }
 }
-
+ 
 export default invit;

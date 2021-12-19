@@ -21,7 +21,7 @@
 
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { Client, DMChannel } from 'discord.js';
+import { Client, DMChannel, Permissions } from 'discord.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -211,10 +211,16 @@ class Bot{
 
 
     async onReady(){
+        this.__logger.info("Lancement du BoBot !");
         const guilds = this.__client.guilds.cache.map(g => g);
         await this.registerCommands();
+        this.__link = await this.__client.generateInvite({
+            scopes: ['bot', 'applications.commands'],
+            permissions: [
+                Permissions.FLAGS.ADMINISTRATOR
+            ]
+        });
 
-        this.__logger.info(this.__client.user.tag + " Connecté !");
         this.__client.user.setPresence({
             status: 'online'
         });
@@ -233,7 +239,7 @@ class Bot{
                 }
             });
         }
-        this.__logger.info("Lancement du BoBot !");
+        this.__logger.info(this.__client.user.tag + " Connecté !");
     }
 
     async onInteraction(interaction){
