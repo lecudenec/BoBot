@@ -36,7 +36,7 @@ class nonPing extends Command {
     }
 
     getDescription() {
-        return "Liste des personnes qui veulent pas se faire ping";
+        return "Permet de ne plus se faire ping par le bot";
     }
 
     isReservedToGod() {
