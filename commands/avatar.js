@@ -20,7 +20,7 @@
 import Command from '../Command.js';
 
 import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { MessageEmbed } from 'discord.js';
+import Logger from '../config/Logger.js';
 
 class avatar extends Command {
     constructor() {
@@ -73,7 +73,7 @@ class avatar extends Command {
         }
         catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur est survenue !", e, "ERR ! avatar");
         }
     }
 }

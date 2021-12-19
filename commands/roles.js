@@ -69,7 +69,7 @@ class roles extends Command {
                 description: message
             }], ephemeral: true});
         } catch(e){
-            console.log("une erreur est survenue Command : roles | ", e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonNext");
         }
     }
 
@@ -96,7 +96,7 @@ class roles extends Command {
                 description: message
             }], ephemeral: true});
         } catch(e){
-            console.log("une erreur est survenue Command : roles | ", e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonPrevious");
         }
     }
 
@@ -105,7 +105,7 @@ class roles extends Command {
             await interraction.deferUpdate();
             await interraction.member.roles.add(this.__roles[this.__id][1]);
         } catch(e){
-            console.log("une erreur est survenue Command : roles lors de l'ajout d'un role | ", e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonAddRole");
         }
         
     }
@@ -115,7 +115,7 @@ class roles extends Command {
             await interraction.deferUpdate();
             await interraction.member.roles.remove(this.__roles[this.__id][1]);
         } catch(e){
-            console.log("une erreur est survenue Command : roles lors de l'ajout d'un role | ", e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonDelRole");
         }
         
     }
@@ -166,7 +166,7 @@ class roles extends Command {
             }], ephemeral: true, components: [row] });
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! roles execute");
         }
         
     }

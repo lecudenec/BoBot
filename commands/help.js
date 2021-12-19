@@ -20,6 +20,7 @@
 import Command from '../Command.js';
 import fs from 'fs';
 import path from 'path';
+import Logger from '../config/Logger.js';
 
 class help extends Command {
     constructor() {
@@ -62,10 +63,9 @@ class help extends Command {
 
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! help");
             return;
         }
-        //console.log("nfdjknfdsq");
 
 
     }

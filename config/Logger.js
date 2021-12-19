@@ -33,15 +33,15 @@ class Logger{
         }
     }
 
-    info(message){
-        this.__write(message, "INFO", console.info);
+    info(message, prefix = "INFO"){
+        this.__write(message, prefix, console.info);
     }
 
     warn(message){
         this.__write(message, "WARN", console.warn);
     }
 
-    error(message, error){
+    error(message, error, prefix = "ERR !"){
         this.__write(message, "ERR!", console.error)
         if(error != undefined) this.__write(error.stack, "ERR!", console.error);
     }

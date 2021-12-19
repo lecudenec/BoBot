@@ -72,7 +72,7 @@ class poll extends Command {
         }
         catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! poll");
         }
     }
 }

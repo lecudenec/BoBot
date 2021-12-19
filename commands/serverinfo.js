@@ -74,7 +74,7 @@ class serverinfo extends Command {
             }], ephemeral: false });
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! serverinfo");
         }
                 
         

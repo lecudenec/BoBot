@@ -20,6 +20,7 @@
 import Command from '../Command.js';
 import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 import fs from 'fs';
+import Logger from '../config/Logger.js';
 
 class config extends Command {
     constructor() {
@@ -98,7 +99,7 @@ class config extends Command {
             await interraction.reply({ content: `Role Disponible :\n${message}`, ephemeral: true });
         } catch(e) {
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! config");
         }
     }
 
@@ -124,12 +125,11 @@ class config extends Command {
             if (test){
                 let dataRole = "";
                 for (let i = 0; i<roles.length; i++){
-                    //console.log(roles[i][0]);
                     if(roles[i][0] !== interraction.options.getRole('role').name && roles [i][0] !== "" && roles[i][1] !== interraction.options.getRole('role').id){
                         dataRole = dataRole + roles[i][0] + ":" + roles[i][1] + ";\n";
                     }
                 }
-                //console.log(dataRole);
+                
                 fs.writeFileSync(`data/${guildid}.txt`, dataRole);
                 await interraction.reply({ content: `Le role a été supprimé !`, ephemeral: true });
             }
@@ -138,7 +138,7 @@ class config extends Command {
             }
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! config");
         }
         
 
@@ -159,7 +159,7 @@ class config extends Command {
             }
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! config");
         }
     }
 
@@ -171,7 +171,7 @@ class config extends Command {
             await interraction.reply({ content: `La config a été vidée !`, ephemeral: true });
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! config");
         }
     }
 

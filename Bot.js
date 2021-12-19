@@ -211,7 +211,7 @@ class Bot{
 
 
     async onReady(){
-        this.__logger.info("Lancement du BoBot !");
+        this.__logger.info("Lancement du BoBot !", "Lancement");
         const guilds = this.__client.guilds.cache.map(g => g);
         await this.registerCommands();
         this.__link = await this.__client.generateInvite({

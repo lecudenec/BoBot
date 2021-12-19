@@ -19,6 +19,7 @@
 
 import Command from '../Command.js';
 import { ApplicationCommandOptionType } from 'discord-api-types/v9';
+import Logger from '../config/Logger.js';
 
 class embed extends Command {
     constructor() {
@@ -135,7 +136,7 @@ class embed extends Command {
         }
         catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
-            console.log(e);
+            Logger.error("Une erreur a eu lieu !", e, "ERR ! embed");
         }
         
     }

@@ -18,6 +18,7 @@
  */
 
 import Command from '../Command.js';
+import fs from 'fs';
 
 class lejeu extends Command {
     constructor() {
@@ -46,13 +47,42 @@ class lejeu extends Command {
         let i = Math.floor(Math.random() * liste[0].size);
         let j = 0;
         let userPing;
-        for (var [key, value] of liste[0]){
-            if(j == i){
-                userPing = value.user.id;
+
+        const guildid = interraction.guild.id;
+
+        let userNonPingList = (fs.readFileSync(`data/nonPingList.txt`, {encoding: "utf-8"})).toString().split('\n');
+        
+        let test1 = true;
+
+        while (test1 && liste[0].size != 0) {
+            j = 0;
+            i = Math.floor(Math.random() * liste[0].size);
+            let test = true;
+            let keyTest;
+            for (var [key, value] of liste[0]){
+                if(j == i){
+                    test = true;
+                    for(let w = 0; w<userNonPingList.length; w++){
+                        if (value.user.id.toString() === userNonPingList[w].toString()){
+                            test = false;
+                            keyTest = key;
+                        }
+                    }
+                    
+                    userPing = value.user.id;
+                }
+    
+                j++;
             }
 
-            j++;
+            if (!test) {
+                liste[0].delete(keyTest);
+            }
+            else {
+                test1 = false;
+            }
         }
+        
         await interraction.reply({ content: "<@" + userPing + "> Le Jeu !"});
     }
 }
