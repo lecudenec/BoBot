@@ -21,6 +21,7 @@ import Command from '../Command.js';
 import fs from 'fs';
 import Bot from '../Bot.js';
 import { MessageActionRow, MessageButton } from 'discord.js';
+import Logger from '../config/Logger.js';
 
 class roles extends Command {
     constructor() {
@@ -29,8 +30,26 @@ class roles extends Command {
         Bot.registerButton("role_previous", this.buttonPrevious.bind(this));
         Bot.registerButton("role_add", this.buttonAddRole.bind(this));
         Bot.registerButton("role_del", this.buttonDelRole.bind(this));
-        //this.__roles;
         this.__id = 0;
+
+        this.__row = new MessageActionRow().addComponents(
+            new MessageButton()
+                .setCustomId("role_previous")
+                .setLabel("Role Précedent")
+                .setStyle("PRIMARY"),
+            new MessageButton()
+                .setCustomId("role_next")
+                .setLabel("Role suivant")
+                .setStyle("PRIMARY"),
+            new MessageButton()
+                .setCustomId("role_add")
+                .setLabel("Ajout du role")
+                .setStyle("SUCCESS"),
+            new MessageButton()
+                .setCustomId("role_del")
+                .setLabel("Suppression du role")
+                .setStyle("SUCCESS")
+        );
     }
 
     getName() {
@@ -67,7 +86,7 @@ class roles extends Command {
                 color: 0x0099ff,
                 title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }], ephemeral: true});
+            }], ephemeral: true, components: [this.__row]});
         } catch(e){
             Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonNext");
         }
@@ -94,27 +113,59 @@ class roles extends Command {
                 color: 0x0099ff,
                 title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }], ephemeral: true});
+            }], ephemeral: true, components: [this.__row]});
         } catch(e){
             Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonPrevious");
         }
     }
 
     async buttonAddRole(interraction){
+        await interraction.deferUpdate();
+
         try{            
-            await interraction.deferUpdate();
+            let message = "Description du rôle : \n" + this.__roles[this.__id][2] + "\n\n*Ce rôle a bien était rajouté !*";
+
             await interraction.member.roles.add(this.__roles[this.__id][1]);
+
+            
+            await interraction.editReply({ embeds: [{
+                color: 0x0099ff,
+                title: 'Rôle : ' + this.__roles[this.__id][0],
+                description: message
+            }], ephemeral: true, components: [this.__row]});
+
         } catch(e){
+            await interraction.editReply({ embeds: [{
+                color: 0xED4245,
+                title: 'ERREUR !',
+                description: 'Je n\'ai pas assez de droit pour t\'ajouter se rôle',
+            }], ephemeral: true});
             Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonAddRole");
+            
         }
         
     }
 
     async buttonDelRole(interraction){
+        await interraction.deferUpdate();
+
         try{
-            await interraction.deferUpdate();
+            let message = "Description du rôle : \n" + this.__roles[this.__id][2] + "\n\n*Le rôle a bien était enlevé !*";
+
             await interraction.member.roles.remove(this.__roles[this.__id][1]);
+
+            
+            await interraction.editReply({ embeds: [{
+                color: 0x0099ff,
+                title: 'Rôle : ' + this.__roles[this.__id][0],
+                description: message
+            }], ephemeral: true, components: [this.__row]});
         } catch(e){
+            await interraction.editReply({ embeds: [{
+                color: 0xf00020,
+                title: 'ERREUR !',
+                description: 'Je n\'ai pas assez de droit pour t\'ajouter se rôle',
+            }], ephemeral: true});
             Logger.error("Une erreur a eu lieu !", e, "ERR ! roles buttonDelRole");
         }
         
@@ -138,32 +189,21 @@ class roles extends Command {
 
             let message = "Description du rôle : \n" + this.__roles[this.__id][2];
 
-            const row = new MessageActionRow().addComponents(
-                new MessageButton()
-                    .setCustomId("role_previous")
-                    .setLabel("Role Précedent")
-                    .setStyle("PRIMARY"),
-                new MessageButton()
-                    .setCustomId("role_next")
-                    .setLabel("Role suivant")
-                    .setStyle("PRIMARY"),
-                new MessageButton()
-                    .setCustomId("role_add")
-                    .setLabel("Ajout du role")
-                    .setStyle("SUCCESS"),
-                new MessageButton()
-                    .setCustomId("role_del")
-                    .setLabel("Suppression du role")
-                    .setStyle("SUCCESS")
-            );
+            
 
-            await interraction.deferReply();
 
-            await interraction.editReply({ embeds: [{
+            await interraction.reply({ embeds: [{
                 color: 0x0099ff,
                 title: 'Rôle : ' + this.__roles[this.__id][0],
                 description: message
-            }], ephemeral: true, components: [row] });
+            }], ephemeral: true, components: [this.__row] });//.then(msg=>msg.deleteReply({timeout:"20000000"/*Time until delete in milliseconds*/}));
+
+            
+            //await interraction.deferReply();
+            //await wait(4000);
+            //await interraction.deleteReply();
+            //await interraction.delete();
+
         } catch(e){
             await interraction.reply({ content: "Une erreur est survenue !", ephemeral:true });
             Logger.error("Une erreur a eu lieu !", e, "ERR ! roles execute");

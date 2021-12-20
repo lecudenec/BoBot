@@ -147,8 +147,11 @@ class config extends Command {
     async exec_add(interraction){
         const guildid = interraction.guild.id;
         try{
-            if (interraction.options.getString("commentaire").length >= 255){
-                await interraction.reply({ content: "Merci de mettre un commentaire inférieur à 255 caractères !", ephemeral: true});
+            if (interraction.options.getString("commentaire") != null){
+                if (interraction.options.getString("commentaire").length >= 255){
+                    await interraction.reply({ content: "Merci de mettre un commentaire inférieur à 255 caractères !", ephemeral: true});
+                }
+                
             }
             else {
                 let dataMessage = interraction.options.getRole('role').name + ":" + interraction.options.getRole('role').id;
