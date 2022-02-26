@@ -43,6 +43,8 @@ class Bot{
         this.__nbInvite = new Map();
     }
 
+    
+
     async registerCommands(){
         await this.__loadCommands();
         await this.__loadDMCommands();
@@ -112,6 +114,26 @@ class Bot{
         }
     }
 
+    
+/*
+    async __loadCommands(){
+        this.__logger.info("Chargement des slash commands global...");
+        try{
+            const commandFiles = fs.readdirSync(path.resolve('globalCommand')).filter(file => file.endsWith('.js'));
+
+            for (let file of commandFiles){
+                const module = await import("file:///" + path.resolve(`commands/${file}`));
+                const command = new module.default;
+                this.__logger.info("Chargement de la commande : " + command.getName());
+                this.__commands[command.getName()] = command;
+            }
+
+        } catch(e){
+            this.__logger.fatal("Échec de l'enregistrement des commandes !", e, 3);
+            return;
+        }
+    }
+*/
     async initClient(){
         this.__client = new Client({ intents: ["GUILDS", "GUILD_PRESENCES", "DIRECT_MESSAGES", "GUILD_MEMBERS", "GUILD_INVITES"], partials: ["CHANNEL"]});
 
@@ -246,7 +268,7 @@ class Bot{
         if (interaction.isCommand()){
             if (this.__commands[interaction.commandName] !== undefined){
                 if (this.__commands[interaction.commandName].isReservedToGod()){
-                    if (!this.__god.includes(interaction.user.id) && interaction.member.id !== interaction.guild.ownerId){
+                    if (!this.__god.includes(interaction.user.id) && interaction.member.id !== interaction.guild.ownerId){ //TODO: Rajouter les admin
                         interaction.reply({ content: "Vous n'êtes pas Dieux !", ephemeral: true});
                         return;
                     }

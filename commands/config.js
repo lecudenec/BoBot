@@ -151,6 +151,14 @@ class config extends Command {
                 if (interraction.options.getString("commentaire").length >= 255){
                     await interraction.reply({ content: "Merci de mettre un commentaire inférieur à 255 caractères !", ephemeral: true});
                 }
+                else {
+                    
+                    let dataMessage = interraction.options.getRole('role').name + ":" + interraction.options.getRole('role').id;
+                    if (interraction.options.getString('commentaire') !== null) dataMessage += ":" + interraction.options.getString('commentaire') + "\n";
+                    else dataMessage += ":Pas de commentaire pour ce rôle\n";
+                    fs.appendFileSync(`data/${guildid}.txt`, dataMessage);
+                    await interraction.reply({ content: "Le role a bien été ajouté !", ephemeral: true });
+                }
                 
             }
             else {

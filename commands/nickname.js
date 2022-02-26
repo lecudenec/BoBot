@@ -70,8 +70,8 @@ class nickname extends Command {
 
     async exec_sparkles(interraction) {
         try {
-            let pseudo = "✨ " + interraction.options.getString('pseudo_with_sparkles') + " ✨";
-            if (pseudo.length > 32) interraction.reply({ content: "Ton pseudo est trop long !", ephemeral: true});
+            let pseudo = "✨" + interraction.options.getString('pseudo_with_sparkles') + "✨";
+            if (pseudo.length >= 32) interraction.reply({ content: "Ton pseudo est trop long !", ephemeral: true});
             else {
                 if (interraction.member.manageable){
                     await interraction.member.setNickname(pseudo);
@@ -91,7 +91,7 @@ class nickname extends Command {
     async exec_rename(interraction) {
         try {
             let pseudo = interraction.options.getString('pseudo');
-            if (pseudo.length > 32) interraction.reply({ content: "Ton pseudo est trop long !", ephemeral: true});
+            if (pseudo.length >= 32) interraction.reply({ content: "Ton pseudo est trop long !", ephemeral: true});
             else {
                 if (interraction.member.manageable){
                     await interraction.member.setNickname(pseudo);
